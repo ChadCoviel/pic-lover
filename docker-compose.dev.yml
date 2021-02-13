@@ -1,0 +1,39 @@
+version: '3.1'
+
+services:
+        frontend:
+                container_name: frontend-dev
+                image: node:latest
+                command: sh -c "npm install -g @angular/cli && npm install && npm install -g typescript@latest && ng serve --proxy-config proxy.conf.json --host 0.0.0.0 --disable-host-check"
+                depends_on: 
+                        - backend
+                environment:
+                        - NODE_ENV=development
+                network_mode: service:database
+                working_dir: /frontend
+                volumes:
+                        - ./frontend/angular:/frontend:cached
+        database: 
+                container_name: db-dev
+                image: postgres:alpine
+                environment:
+                        - POSTGRES_USER=user
+                        - POSTGRES_PASSWORD=secure1
+                        - POSTGRES_DB=test_db
+                ports:
+                        - "5432:5432"
+                        - "4200:4200"
+                        - "3000:3000"
+        backend:
+                container_name: backend-dev
+                image: node:latest
+                command: sh -c "npm install && npm install -g sequelize && npm install -g sequelize-cli && npm start"
+                depends_on: 
+                        - database
+                environment:
+                        - NODE_ENV=development
+                        - DB_CONNECTION=postgres://user:secure1@database/test_db
+                network_mode: service:database
+                working_dir: /backend
+                volumes:
+                        - ./backend:/backend:cached
