@@ -12,14 +12,18 @@ module.exports = function readPropFileSync(path) {
 	let text = fs.readFileSync(path, "utf8")
 	text.split("\n")
 		.forEach( keyVal => {
-			console.log(keyVal)
-			if ( keyVal.match(/(?<!\\)=/) || keyVal.match(/(?<!\\):/) && ! keyVal.match(/^#/) && ! keyVal.match(/^ .*#/) && ! keyVal.match(/^!/) && ! keyVal.match(/^ .*!/)) {
-				if (keyVal.match(/(?<!\\)=/).index < keyVal.match(/(?<!\\):/).index) {
-					map.set(keyVal.split(/(?<!\\)=/)[0].replace(/\\/g, '').trim(), keyVal.split(/(?<!\\)=/).slice(1).join("=").replace(/\\/g, '').trim());
-				} else {
-					map.set(keyVal.split(/(?<!\\):/)[0].replace(/\\/g, '').trim(), keyVal.split(/(?<!\\):/).slice(1).join("=").replace(/\\/g, '').trim());
+			if (! keyVal.match(/^#/) && ! keyVal.match(/^ .*#/) && ! keyVal.match(/^!/) && ! keyVal.match(/^ .*!/)) {
+				if (keyVal.match(/(?<!\\)=/) && keyVal.match(/(?<!\\):/)) {
+					if (keyVal.match(/(?<!\\)=/).index < keyVal.match(/(?<!\\):/).index) {
+						map.set(keyVal.split(/(?<!\\)=/)[0].trim(), keyVal.split(/(?<!\\)=/).slice(1).join("=").trim());
+					} else {
+						map.set(keyVal.split(/(?<!\\):/)[0].trim(), keyVal.split(/(?<!\\):/).slice(1).join("=").trim());
+					}
+				} else if (keyVal.match(/(?<!\\)=/)) {
+					map.set(keyVal.split(/(?<!\\)=/)[0].trim(), keyVal.split(/(?<!\\)=/).slice(1).join("=").trim());
+				} else if (keyVal.match(/(?<!\\):/)) {
+					map.set(keyVal.split(/(?<!\\):/)[0].trim(), keyVal.split(/(?<!\\):/).slice(1).join("=").trim());
 				}
-				
 			}
 		});
 	if (map.size === 0) {
@@ -27,3 +31,5 @@ module.exports = function readPropFileSync(path) {
 	}
 	return map;	
 };
+
+// replace(/\\/g, '')

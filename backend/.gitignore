@@ -2,3 +2,11 @@
 
 # System Files
 .DS_Store
+
+# Scraper files
+/scraper/*.html
+/scraper/backup.js
+/scraper/test.properties
+
+# Misc
+*.test.js

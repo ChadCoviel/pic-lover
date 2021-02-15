@@ -42,4 +42,11 @@ app.use(function(err, req, res, next) {
   res.render('error');
 });
 
+process.on("unhandledRejection", (reason, promise) => {
+    // reason is whatever value would have been passed to a .catch() function
+    // promise is the Promise object that rejected
+    console.log(reason)
+    console.log(promise)
+});
+
 module.exports = app;
