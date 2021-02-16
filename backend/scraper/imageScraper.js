@@ -28,26 +28,25 @@ function constructQueries(search,propPath) {
 	return queries
 }
 
-module.exports = async function getImages(search) {
-	let images = []
+const scrapeImages = function(query) {
+	return axios.get(query['query'])
+		.then((content) => {
+			return scrapers[`scrape${query['source']}`](content.data)
+		})
+		.catch(error => {throw e})
+}
+
+module.exports = async function getImageURLs(search,callback) {
+	// let images = []
 	let queries = constructQueries(search,'../webpages.properties')
 	if (queries.length === 0 ) {
 		throw new Error("ERROR: No queries available to scrape from")
 	}
 	console.log(queries)
 
-	queries.forEach((query) => {
-		axios.get(query['query'])
-			.then((content) => {
-				return scrapers[`scrape${query['source']}`](content.data)
-			})
-			.then((imageResults) => {
-				console.log(imageResults)
-				images.push(imageResults)
-			})
-			.catch((error) => {
-				throw error
-			});
-		});
-}
+	promises = queries.map(scrapeImages);
+	// console.log(promises)
 
+	let images = await Promise.all(promises)
+	callback(images.flat(2))
+}
